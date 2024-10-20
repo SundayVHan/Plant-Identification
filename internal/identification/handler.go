@@ -2,6 +2,7 @@ package identification
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"net/http"
@@ -10,6 +11,11 @@ import (
 
 type QARequest struct {
 	Image string `json:"image" binding:"required"`
+}
+
+type ReasonResponse struct {
+	Label     string `json:"label"`
+	Responese string `json:"responese"`
 }
 
 func QA(c *gin.Context) {
@@ -37,7 +43,9 @@ func QA(c *gin.Context) {
 
 	resp, err := client.R().
 		SetHeader("Accept", "application/json").
-		SetQueryParam("img_url", url).
+		SetBody(map[string]interface{}{
+			"img_url": url,
+		}).
 		Get("http://localhost:5000/get_response")
 
 	if err != nil || resp.StatusCode() != http.StatusOK {
@@ -45,5 +53,11 @@ func QA(c *gin.Context) {
 		return
 	}
 
-	common.Success(c, "identification success", resp.Body())
+	var res ReasonResponse
+	if err = json.Unmarshal(resp.Body(), &res); err != nil {
+		common.Error(c, common.ErrInternal, "identification process failed", http.StatusInternalServerError)
+		return
+	}
+
+	common.Success(c, "identification success", res)
 }
