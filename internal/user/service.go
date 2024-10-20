@@ -4,8 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"plant_identification/internal/database"
 	"plant_identification/internal/util"
 )
+
+func Init() {
+	err := database.DB.AutoMigrate(&User{})
+	if err != nil {
+		panic(err)
+	}
+}
 
 func RegisterUser(userName string, password string) error {
 	// 将密码哈希后存入

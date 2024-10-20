@@ -1,4 +1,4 @@
-package router
+package common
 
 type WebCode int
 
@@ -8,4 +8,6 @@ const (
 	ErrUserNotFound
 	ErrRegisterFailed
 	ErrLoginFailed
+	ErrParamMissing
+	ErrInternal
 )

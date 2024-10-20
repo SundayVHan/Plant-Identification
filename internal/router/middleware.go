@@ -4,6 +4,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"plant_identification/config"
+	"plant_identification/internal/common"
 	"plant_identification/internal/user"
 	"plant_identification/internal/util"
 	"strings"
@@ -14,7 +16,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			Abort(c, ErrUnauthorized, "jwt not found in header", http.StatusUnauthorized)
+			common.Abort(c, common.ErrUnauthorized, "jwt not found in header", http.StatusUnauthorized)
 			return
 		}
 
@@ -23,17 +25,17 @@ func AuthMiddleware() gin.HandlerFunc {
 		claims := &util.UserClaims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte("your_secret_key"), nil
+			return []byte(config.JWTSecret), nil
 		})
 
 		if err != nil || !token.Valid {
-			Abort(c, ErrTokenInvalid, "Invalid or expired token", http.StatusUnauthorized)
+			common.Abort(c, common.ErrTokenInvalid, "Invalid or expired token", http.StatusUnauthorized)
 			return
 		}
 
-		u, err := user.GetUser(claims.UserName)
+		u, err := user.GetUser(claims.Username)
 		if authHeader == "" {
-			Abort(c, ErrUserNotFound, "token valid but user not found", http.StatusInternalServerError)
+			common.Abort(c, common.ErrUserNotFound, "token valid but user not found", http.StatusInternalServerError)
 			return
 		}
 		c.Set("user", u)

@@ -1,10 +1,11 @@
-package app
+package main
 
 import (
 	"github.com/gin-gonic/gin"
 	"plant_identification/config"
 	"plant_identification/internal/database"
 	"plant_identification/internal/router"
+	"plant_identification/internal/user"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 	config.LoadConfig()
 
 	database.Init()
+	user.Init()
 
 	r := gin.Default()
 	router.RegisterRoutes(r)

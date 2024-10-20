@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"plant_identification/config"
-	"plant_identification/internal/user"
 )
 
 var DB *gorm.DB
@@ -26,7 +25,4 @@ func Init() {
 	if err != nil {
 		log.Fatal("failed to connect to the database:", err)
 	}
-
-	// 自动迁移数据库
-	DB.AutoMigrate(&user.User{})
 }

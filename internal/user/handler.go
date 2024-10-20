@@ -3,7 +3,7 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"plant_identification/internal/router"
+	"plant_identification/internal/common"
 )
 
 func Register(c *gin.Context) {
@@ -12,11 +12,11 @@ func Register(c *gin.Context) {
 
 	token, err := RegisterAndIssueToken(userName, password)
 	if err != nil {
-		router.Error(c, router.ErrRegisterFailed, err.Error(), http.StatusBadRequest)
+		common.Error(c, common.ErrRegisterFailed, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	router.Success(c, "User successfully registered", gin.H{"token": token})
+	common.Success(c, "User successfully registered", gin.H{"token": token})
 }
 
 func Login(c *gin.Context) {
@@ -26,10 +26,10 @@ func Login(c *gin.Context) {
 	token, err := LoginAndIssueToken(userName, password)
 	if err != nil {
 		// 业务链异常
-		router.Error(c, router.ErrLoginFailed, err.Error(), http.StatusBadRequest)
+		common.Error(c, common.ErrLoginFailed, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// 验证成功
-	router.Success(c, "User successfully logged in", gin.H{"token": token})
+	common.Success(c, "User successfully logged in", gin.H{"token": token})
 }
