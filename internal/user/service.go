@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"plant_identification/internal/common"
 	"plant_identification/internal/database"
 	"plant_identification/internal/util"
 )
@@ -17,6 +18,14 @@ func Init() {
 
 func RegisterUser(userName string, password string) error {
 	// 将密码哈希后存入
+	_, err := getUser(userName)
+	if err == nil {
+		return common.CustomError{
+			Code:    common.ErrUsernameUsed,
+			Message: "Username has been used",
+		}
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("could not hash password: %v", err)
@@ -31,24 +40,31 @@ func RegisterUser(userName string, password string) error {
 	return saveUser(user)
 }
 
-func LoginUser(userName string, password string) (bool, error) {
+func LoginUser(userName string, password string) error {
 	user, err := getUser(userName)
 	if err != nil {
-		return false, fmt.Errorf("could not find user: %v", err)
+		return common.CustomError{
+			Message: "User not registered",
+			Code:    common.ErrUserNotRegistered,
+		}
 	}
 
 	// 验证输入的密码和数据库中的哈希密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			// 密码不匹配
-			return false, nil
+			return common.CustomError{
+				Message: "Password mismatch",
+				Code:    common.ErrPasswordMismatch,
+			}
+		} else {
+			return err
 		}
-		return false, fmt.Errorf("could not compare password: %v", err)
+
 	}
 
 	// 密码匹配，认证成功
-	return true, nil
+	return nil
 }
 
 func RegisterAndIssueToken(username, password string) (string, error) {
@@ -68,13 +84,9 @@ func RegisterAndIssueToken(username, password string) (string, error) {
 
 func LoginAndIssueToken(username, password string) (string, error) {
 	// 首先进行用户验证
-	isAuthenticated, err := LoginUser(username, password)
+	err := LoginUser(username, password)
 	if err != nil {
 		return "", err // 返回错误给外层
-	}
-
-	if !isAuthenticated {
-		return "", errors.New("invalid username or password")
 	}
 
 	// 假设用户登录成功，生成JWT

@@ -12,7 +12,7 @@ func Register(c *gin.Context) {
 
 	token, err := RegisterAndIssueToken(userName, password)
 	if err != nil {
-		common.Error(c, common.ErrRegisterFailed, err.Error(), http.StatusBadRequest)
+		common.Error(c, err, common.ErrRegisterFailed)
 		return
 	}
 
@@ -25,8 +25,7 @@ func Login(c *gin.Context) {
 
 	token, err := LoginAndIssueToken(userName, password)
 	if err != nil {
-		// 业务链异常
-		common.Error(c, common.ErrLoginFailed, err.Error(), http.StatusBadRequest)
+		common.Error(c, err, http.StatusBadRequest)
 		return
 	}
 

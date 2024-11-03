@@ -10,4 +10,17 @@ const (
 	ErrLoginFailed
 	ErrParamMissing
 	ErrInternal
+	ErrUsernameUsed
+	ErrPasswordMismatch
+	ErrUserNotRegistered
+	ErrLMResponse
 )
+
+type CustomError struct {
+	Message string
+	Code    WebCode
+}
+
+func (e CustomError) Error() string {
+	return e.Message
+}

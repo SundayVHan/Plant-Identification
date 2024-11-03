@@ -15,5 +15,5 @@ func RegisterRoutes(r *gin.Engine) {
 	identApi := api.Group("/identification")
 	identApi.Use(AuthMiddleware())
 	identApi.POST("/qa", identification.QA)
-	identApi.GET("history")
+	identApi.GET("/history", identification.GetHistory)
 }

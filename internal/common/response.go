@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,12 +20,21 @@ func Success(c *gin.Context, message string, data interface{}) {
 	})
 }
 
-func Error(c *gin.Context, code WebCode, message string, httpStatusCode int) {
-	c.JSON(httpStatusCode, Response{
-		Code:    code,
-		Message: message,
-		Data:    nil,
-	})
+func Error(c *gin.Context, err error, unexpectedCode WebCode) {
+	var cErr *CustomError
+	if errors.As(err, &cErr) {
+		c.JSON(http.StatusBadRequest, Response{
+			Code:    cErr.Code,
+			Message: cErr.Message,
+			Data:    nil,
+		})
+	} else {
+		c.JSON(http.StatusInternalServerError, Response{
+			Code:    unexpectedCode,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
 }
 
 func Abort(c *gin.Context, code WebCode, message string, httpStatusCode int) {
