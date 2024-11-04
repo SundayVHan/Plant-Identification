@@ -30,7 +30,7 @@ func UploadImage(imageData []byte) (string, error) {
 		return "", err
 	}
 
-	url := bucketName + "." + endpoint + "/" + objPath
+	url := "https://" + bucketName + "." + endpoint + "/" + objPath
 	return url, err
 }
 

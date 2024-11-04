@@ -38,8 +38,8 @@ type QARequest struct {
 }
 
 type ReasonResponse struct {
-	Label     string `json:"label"`
-	Responese string `json:"responese"`
+	Label    string `json:"label"`
+	Response string `json:"response"`
 }
 
 type History struct {

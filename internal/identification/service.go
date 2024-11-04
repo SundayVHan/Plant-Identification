@@ -23,7 +23,7 @@ func QueryLM(imgUrl string, userId int64, imageData []byte) (res ReasonResponse,
 		SetBody(map[string]interface{}{
 			"img_url": imgUrl,
 		}).
-		Get("http://localhost:5000/get_response")
+		Post("http://127.0.0.1:5000/get_response")
 
 	if err != nil || resp.StatusCode() != http.StatusOK {
 		retErr = common.CustomError{
@@ -38,7 +38,7 @@ func QueryLM(imgUrl string, userId int64, imageData []byte) (res ReasonResponse,
 		return
 	}
 
-	if err = setHistory(userId, imageData, res.Label, res.Responese); err != nil {
+	if err = setHistory(userId, imageData, res.Label, res.Response); err != nil {
 		retErr = err
 		return
 	}

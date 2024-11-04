@@ -21,7 +21,7 @@ func Success(c *gin.Context, message string, data interface{}) {
 }
 
 func Error(c *gin.Context, err error, unexpectedCode WebCode) {
-	var cErr *CustomError
+	var cErr CustomError
 	if errors.As(err, &cErr) {
 		c.JSON(http.StatusBadRequest, Response{
 			Code:    cErr.Code,
