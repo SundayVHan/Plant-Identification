@@ -2,8 +2,10 @@ package identification
 
 import (
 	"bytes"
+	"errors"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"plant_identification/internal/database"
 )
 
@@ -34,7 +36,7 @@ func UploadImage(imageData []byte) (string, error) {
 	return url, err
 }
 
-func setHistory(userId int64, imageBase64 []byte, label string, response string) error {
+func setHistory(userId int64, imageBase64 []byte, label string, response string) (History, error) {
 	historyRecord := History{
 		UserId:      userId,
 		ImageBase64: imageBase64,
@@ -43,10 +45,10 @@ func setHistory(userId int64, imageBase64 []byte, label string, response string)
 	}
 
 	if err := database.DB.Create(&historyRecord).Error; err != nil {
-		return err
+		return historyRecord, err
 	}
 
-	return nil
+	return historyRecord, nil
 }
 
 func getHistoriesByUserId(userId int64) ([]History, error) {
@@ -58,4 +60,31 @@ func getHistoriesByUserId(userId int64) ([]History, error) {
 	}
 
 	return histories, nil // 返回查询到的历史记录和 nil 错误
+}
+
+func setStar(userId int64, historyId int64) error {
+	var history History
+
+	// 查询指定历史记录
+	if err := database.DB.First(&history, historyId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("history record not found")
+		}
+		return err // 处理其他查询错误
+	}
+
+	// 确保是合法用户的记录
+	if history.UserId != userId {
+		return errors.New("user does not have permission to modify this history record")
+	}
+
+	// 更新星标状态
+	history.Star = !history.Star // 切换星标状态
+
+	// 保存更改
+	if err := database.DB.Save(&history).Error; err != nil {
+		return err // 处理保存错误
+	}
+
+	return nil // 返回 nil，表示成功
 }

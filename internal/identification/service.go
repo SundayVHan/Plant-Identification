@@ -38,10 +38,13 @@ func QueryLM(imgUrl string, userId int64, imageData []byte) (res ReasonResponse,
 		return
 	}
 
-	if err = setHistory(userId, imageData, res.Label, res.Response); err != nil {
+	history, err := setHistory(userId, imageData, res.Label, res.Response)
+	if err != nil {
 		retErr = err
 		return
 	}
+
+	res.ID = history.ID
 
 	return
 }
