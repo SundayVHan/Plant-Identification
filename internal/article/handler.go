@@ -59,7 +59,7 @@ func GenerateArticle(c *gin.Context) {
 	completion, err := client.Chat.Completions.New(ctx,
 		openai.ChatCompletionNewParams{
 			Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
-				openai.SystemMessage("根据用户的输入，帮助用户续写一段一篇短文"),
+				openai.SystemMessage("根据用户的输入的标题，写一段短文"),
 				openai.UserMessage(req.Text),
 			}),
 			Model: openai.F("hunyuan-pro"),
