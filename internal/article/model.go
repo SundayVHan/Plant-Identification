@@ -12,3 +12,11 @@ type PublishArticleRequest struct {
 	ImgBase64 string `json:"img_base64"`
 	Title     string `json:"title"`
 }
+
+type GenerateArticleRequest struct {
+	Text string `json:"text"`
+}
+
+type GenerateArticleResponse struct {
+	Generation string `json:"generation"`
+}

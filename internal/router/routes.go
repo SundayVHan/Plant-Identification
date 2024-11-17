@@ -29,4 +29,5 @@ func RegisterRoutes(r *gin.Engine) {
 	articleApi.Use(AuthMiddleware())
 	articleApi.GET("/publish", article.PublishArticle)
 	articleApi.GET("/fetch", article.FetchArticle)
+	articleApi.POST("/generation", article.GenerateArticle)
 }
