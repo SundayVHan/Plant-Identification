@@ -13,9 +13,9 @@ func PublishArticle(c *gin.Context) {
 	_user, _ := c.Get("user")
 	user, _ := _user.(user2.User)
 
-	if user.Kind == 0 {
+	if user.Kind == 1 {
 		err := common.CustomError{
-			Code:    common.ErrKindIsZero,
+			Code:    common.ErrKindIsOne,
 			Message: "only user whose kind = 1 can publish article",
 		}
 		common.Error(c, err, common.ErrUnauthorized)
@@ -59,7 +59,7 @@ func GenerateArticle(c *gin.Context) {
 	completion, err := client.Chat.Completions.New(ctx,
 		openai.ChatCompletionNewParams{
 			Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
-				openai.SystemMessage("根据用户的输入的标题，写一段短文"),
+				openai.SystemMessage("根据用户的输入的标题，写一段短文（只含内容即可，无需包含标题）"),
 				openai.UserMessage(req.Text),
 			}),
 			Model: openai.F("hunyuan-pro"),

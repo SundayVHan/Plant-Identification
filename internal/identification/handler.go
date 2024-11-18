@@ -58,7 +58,7 @@ func SetStar(c *gin.Context) {
 	_user, _ := c.Get("user")
 	user, _ := _user.(user2.User)
 
-	_id := c.Param("id")
+	_id := c.Query("id")
 	id, _ := strconv.Atoi(_id)
 
 	err := setStar(user.ID, int64(id))

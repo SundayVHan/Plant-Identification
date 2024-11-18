@@ -16,7 +16,7 @@ func Init() {
 	}
 }
 
-func RegisterUser(userName string, password string) error {
+func RegisterUser(userName string, password string, kind int64) error {
 	// 将密码哈希后存入
 	_, err := getUser(userName)
 	if err == nil {
@@ -34,16 +34,16 @@ func RegisterUser(userName string, password string) error {
 	user := User{
 		Username: userName,
 		Password: string(hashedPassword),
-		Kind:     0,
+		Kind:     kind,
 	}
 
 	return saveUser(user)
 }
 
-func LoginUser(userName string, password string) error {
+func LoginUser(userName string, password string) (int64, error) {
 	user, err := getUser(userName)
 	if err != nil {
-		return common.CustomError{
+		return 0, common.CustomError{
 			Message: "User not registered",
 			Code:    common.ErrUserNotRegistered,
 		}
@@ -53,22 +53,22 @@ func LoginUser(userName string, password string) error {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return common.CustomError{
+			return 0, common.CustomError{
 				Message: "Password mismatch",
 				Code:    common.ErrPasswordMismatch,
 			}
 		} else {
-			return err
+			return 0, err
 		}
 
 	}
 
 	// 密码匹配，认证成功
-	return nil
+	return user.Kind, nil
 }
 
-func RegisterAndIssueToken(username, password string) (string, error) {
-	err := RegisterUser(username, password)
+func RegisterAndIssueToken(username, password string, kind int64) (string, error) {
+	err := RegisterUser(username, password, kind)
 	if err != nil {
 		return "", err // 返回错误给外层
 	}
@@ -82,20 +82,20 @@ func RegisterAndIssueToken(username, password string) (string, error) {
 	return token, nil
 }
 
-func LoginAndIssueToken(username, password string) (string, error) {
+func LoginAndIssueToken(username, password string) (string, int64, error) {
 	// 首先进行用户验证
-	err := LoginUser(username, password)
+	kind, err := LoginUser(username, password)
 	if err != nil {
-		return "", err // 返回错误给外层
+		return "", 0, err // 返回错误给外层
 	}
 
 	// 假设用户登录成功，生成JWT
 	token, err := util.GenerateToken(username)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return token, nil
+	return token, kind, nil
 }
 
 func GetUser(username string) (User, error) {

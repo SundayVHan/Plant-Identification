@@ -23,9 +23,9 @@ func CountThumbs(c *gin.Context) {
 	_user, _ := c.Get("user")
 	user, _ := _user.(user2.User)
 
-	if user.Kind == 0 {
+	if user.Kind == 1 {
 		err := common.CustomError{
-			Code:    common.ErrKindIsZero,
+			Code:    common.ErrKindIsOne,
 			Message: "only user whose kind = 1 can count thumbs",
 		}
 		common.Error(c, err, common.ErrUnauthorized)

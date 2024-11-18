@@ -63,10 +63,12 @@ func getHistoriesByUserId(userId int64) ([]History, error) {
 }
 
 func setStar(userId int64, historyId int64) error {
-	var history History
+	history := History{
+		ID: historyId,
+	}
 
 	// 查询指定历史记录
-	if err := database.DB.First(&history, historyId).Error; err != nil {
+	if err := database.DB.First(&history).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("history record not found")
 		}

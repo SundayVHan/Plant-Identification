@@ -13,6 +13,7 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		println(c.FullPath())
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {

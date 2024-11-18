@@ -14,7 +14,7 @@ const (
 	ErrPasswordMismatch
 	ErrUserNotRegistered
 	ErrLMResponse
-	ErrKindIsZero
+	ErrKindIsOne
 )
 
 type CustomError struct {
